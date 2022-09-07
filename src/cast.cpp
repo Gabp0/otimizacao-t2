@@ -3,6 +3,7 @@
 #include <set>
 #include <iostream>
 #include <limits>
+#include <chrono>
 
 using namespace std;
 
@@ -27,9 +28,29 @@ Cast::Cast()
 
         this->a.insert(aux);
     }
+
+    this->defFunc = true;
+    this->viabCut = true;
+    this->optCut = true;
+}
+
+void Cast::toggleDefaultFunc()
+{
+    this->defFunc = !this->defFunc;
+}
+
+void Cast::toggleViabilityCut()
+{
+    this->viabCut = !this->viabCut;
+}
+
+void Cast::toggleOptimalityCut()
+{
+    this->optCut = !this->optCut;
 }
 
 bool checkUnionX(set<Actor> x, int l)
+// faz a uniao dos grupos dos conjuntos de atores X, entao compara com S
 {
     set<int> ux;
     for (auto itr = x.begin(); itr != x.end(); ++itr)
@@ -43,6 +64,7 @@ bool checkUnionX(set<Actor> x, int l)
 }
 
 bool checkUnionXA(set<Actor> x, set<Actor> a, int l)
+// faz a uniao dos grupos dos conjuntos de atores X e A, entao compara com S
 {
     set<int> uxa;
 
@@ -64,6 +86,7 @@ bool checkUnionXA(set<Actor> x, set<Actor> a, int l)
 }
 
 int sumValues(set<Actor> x)
+// soma o valor de um conjunto de atores
 {
     int sum = 0;
     for (auto itr = x.begin(); itr != x.end(); ++itr)
@@ -75,7 +98,8 @@ int sumValues(set<Actor> x)
     return sum;
 }
 
-int bound()
+int bound(bool defaultFunction)
+// funcao limitante
 {
     return numeric_limits<int>::min();
 }
@@ -83,47 +107,79 @@ int bound()
 void Cast::bb(set<Actor> x, set<Actor> a)
 {
     if ((x.size() == this->n) && (checkUnionX(x, this->l)))
-    {
+    { // folha da arvore
+
         int v = sumValues(x);
         if (v < this->opt)
-        {
+        { // testa se é melhor que o otimo
             this->opt = v;
             this->xopt.clear();
             this->xopt.insert(x.begin(), x.end());
         }
     }
-    else if ((x.size() + a.size() >= this->n) && (checkUnionXA(x, a, this->l)))
+    else if (a.size() == 0)
     {
-        int b = bound();
-        if (b >= this->opt)
-        {
+        return;
+    }
+    else
+    {
+        if (this->viabCut && (!(x.size() + a.size() >= this->n) || !(checkUnionXA(x, a, this->l))))
+        { // corte por viabilidade
             return;
         }
+        else
+        {
+            int b = bound(this->defFunc);
+            if (this->optCut && (b >= this->opt))
+            { // corte por otimalidade
+                return;
+            }
 
-        auto cl = *a.begin();
-        a.erase(a.begin());
+            auto cl = *a.begin();
+            a.erase(a.begin());
 
-        bb(x, a);
+            this->node++;
+            bb(x, a); // nao contem o elemento
 
-        x.insert(cl);
-        bb(x, a);
+            x.insert(cl);
+            this->node++;
+            bb(x, a); // contem o elemento
+
+            return;
+        }
     }
 }
 
-void Cast::branchAndBound(bool defLF, bool vblt, bool opt)
+void Cast::branchAndBound()
 {
     set<Actor> a;
-    set<Actor> x;
-    a.insert(this->a.begin(), this->a.end());
-    this->opt = numeric_limits<int>::max();
+    a.insert(this->a.begin(), this->a.end()); // atores que podem ser escolhidos
 
-    this->bb(x, a);
+    set<Actor> x; // atores escolhidos
 
-    for (auto itr = this->xopt.begin(); itr != this->xopt.end(); ++itr)
+    this->opt = numeric_limits<int>::max(); // otimo
+    this->node = 0;                         // numero de nodos
+
+    auto start = chrono::high_resolution_clock::now();
+    this->bb(x, a); // chamada do branch and bound
+    auto stop = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+
+    if (this->opt == numeric_limits<int>::max())
     {
-        Actor ac = *itr;
-        cout << ac.getId() << " ";
+        cout << "Inviável" << endl;
     }
-    cout << endl
-         << this->opt << endl;
+    else
+    {
+        for (auto itr = this->xopt.begin(); itr != this->xopt.end(); ++itr)
+        {
+            Actor ac = *itr;
+            cout << ac.getId() << " ";
+        }
+        cout << endl;
+        cout << this->opt << endl;
+    }
+
+    cerr << "Tempo: " << duration.count() << " microsegundos" << endl;
+    cerr << "Nodes: " << this->node << endl;
 }

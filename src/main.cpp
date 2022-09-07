@@ -3,7 +3,12 @@
 int main(int argc, char const *argv[])
 {
     Cast c;
-    c.branchAndBound(false, false, false);
+
+    // c.toggleDefaultFunc();
+    c.toggleOptimalityCut();
+    c.toggleViabilityCut();
+
+    c.branchAndBound();
 
     return 0;
 }

@@ -16,12 +16,22 @@ private:
     set<Actor> xopt; // conjunto de atores selecionados
     int opt;         // otimo
 
+    bool defFunc; // controle do bb
+    bool viabCut;
+    bool optCut;
+
+    int node;
+
     void bb(set<Actor> x, set<Actor> a);
 
 public:
     Cast(/* args */);
     //~Cast();
-    void branchAndBound(bool defLF, bool vblt, bool opt);
+
+    void toggleDefaultFunc();
+    void toggleViabilityCut();
+    void toggleOptimalityCut();
+    void branchAndBound();
 };
 
 #endif
