@@ -2,6 +2,7 @@ from random import randint
 
 l, m, n = input().split(" ")
 
+print(f"{l} {m} {n}")
 for i in range(0, int(m)):
     gNum = randint(1, int(l))
 
