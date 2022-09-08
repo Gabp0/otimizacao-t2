@@ -213,11 +213,16 @@ int Cast::bound(list<Actor> x, list<Actor> a)
         int greedySum = 0;
         int remainingSize = this->n - x.size();
         list<Actor> aux(a);
+        if (remainingSize > aux.size())
+            return numeric_limits<int>::min();
+        cout << "bound" << endl;
         for (size_t i = 0; i < remainingSize; i++)
         {
+            cout << aux.front().getValue() << endl;
             greedySum += aux.front().getValue();
             aux.pop_front();
         }
+        cout << "sum: " << greedySum << endl;
 
         return sumValues(x) + greedySum;
     }
@@ -227,9 +232,9 @@ int Cast::bound(list<Actor> x, list<Actor> a)
 
 void Cast::bb(list<Actor> x, list<Actor> a)
 {
+
     if ((x.size() == this->n) && (grouplistUnionX(x) == this->l))
     { // folha da arvore
-
         int v = sumValues(x);
 
         if (v < this->opt)
@@ -272,9 +277,18 @@ void Cast::bb(list<Actor> x, list<Actor> a)
     }
 }
 
-bool compare(const Actor &first, const Actor &second)
+bool compareValue(const Actor &first, const Actor &second)
 {
-    return ((first.getValue() / first.getGroupSize()) < (second.getValue() / second.getGroupSize()));
+    // return ((first.getValue() / first.getGroupSize()) < (second.getValue() / second.getGroupSize()));
+    //  return first.getId() > second.getId();
+    return (first.getValue() < second.getValue());
+}
+
+bool compareId(const Actor &first, const Actor &second)
+{
+    // return ((first.getValue() / first.getGroupSize()) < (second.getValue() / second.getGroupSize()));
+    return first.getId() < second.getId();
+    // return ((first.getValue()) > (second.getValue()));
 }
 
 void Cast::branchAndBound()
@@ -286,7 +300,12 @@ void Cast::branchAndBound()
     this->nodeCount = 0;                    // numero de nodos
 
     auto start = chrono::high_resolution_clock::now();
-    a.sort(compare);
+    a.sort(compareValue);
+    for (Actor ac : a)
+    {
+        cout << ac.getValue() << " / " << ac.getGroupSize() << " = " << ac.getValue() / ac.getGroupSize() << endl;
+    }
+
     this->bb(x, a); // chamada do branch and bound
     auto stop = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
@@ -295,13 +314,13 @@ void Cast::branchAndBound()
 
 void Cast::showResults()
 {
-
     if (this->opt == numeric_limits<int>::max())
     {
         cout << "Inviável" << endl;
     }
     else
     {
+        this->xopt.sort(compareId);
         for (Actor ac : this->xopt)
         {
             cout << ac.getId() << " ";
