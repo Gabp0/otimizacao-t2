@@ -26,14 +26,16 @@ int Actor::getGroupSize() const
     return this->s;
 }
 
-set<int> Actor::getGroups()
+list<int> Actor::getGroups()
 {
     return this->groups;
 }
 
 void Actor::addGroup(int g)
 {
-    this->groups.insert(g);
+    list<int> b;
+    b.push_back(g);
+    this->groups.merge(b);
 }
 
 ostream &operator<<(ostream &os, const Actor &obj)

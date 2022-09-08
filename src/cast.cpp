@@ -2,6 +2,7 @@
 #include "actor.h"
 #include "quicksort.h"
 #include <set>
+#include <list>
 #include <iostream>
 #include <limits>
 #include <chrono>
@@ -53,82 +54,37 @@ void Cast::toggleOptimalityCut()
 int Cast::groupSetUnionX(set<Actor> x)
 // faz a uniao dos grupos dos conjuntos de atores X
 {
-    int b[this->l];
-    int bSize = 0;
+    list<int> ux;
 
     for (auto itr = x.begin(); itr != x.end(); ++itr)
     {
         Actor ac = *itr;
-        set<int> groups = ac.getGroups();
-        for (auto itr2 = groups.begin(); itr2 != groups.end(); ++itr2)
-        {
-            int g = *itr2;
-            int i;
-
-            for (i = 0; i < bSize; i++)
-            {
-                if (g == b[i])
-                    break;
-            }
-            if (i == bSize)
-            {
-                b[bSize] = g;
-                bSize++;
-            }
-        }
+        list<int> groups(ac.getGroups());
+        ux.merge(groups);
     }
-    return bSize;
+    ux.unique();
+    return ux.size();
 }
 
 int Cast::groupSetUnionXA(set<Actor> x, set<Actor> a)
 // faz a uniao dos grupos dos conjuntos de atores X
 {
-    int b[this->l];
-    int bSize = 0;
+    list<int> uxa;
 
     for (auto itr = x.begin(); itr != x.end(); ++itr)
     {
         Actor ac = *itr;
-        set<int> groups = ac.getGroups();
-        for (auto itr2 = groups.begin(); itr2 != groups.end(); ++itr2)
-        {
-            int g = *itr2;
-            int i;
-
-            for (i = 0; i < bSize; i++)
-            {
-                if (g == b[i])
-                    break;
-            }
-            if (i == bSize)
-            {
-                b[bSize] = g;
-                bSize++;
-            }
-        }
+        list<int> groups(ac.getGroups());
+        uxa.merge(groups);
     }
     for (auto itr = a.begin(); itr != a.end(); ++itr)
     {
         Actor ac = *itr;
-        set<int> groups = ac.getGroups();
-        for (auto itr2 = groups.begin(); itr2 != groups.end(); ++itr2)
-        {
-            int g = *itr2;
-            int i;
-
-            for (i = 0; i < bSize; i++)
-            {
-                if (g == b[i])
-                    break;
-            }
-            if (i == bSize)
-            {
-                b[bSize] = g;
-                bSize++;
-            }
-        }
+        list<int> groups(ac.getGroups());
+        uxa.merge(groups);
     }
-    return bSize;
+    uxa.unique();
+    return uxa.size();
 }
 
 int sumValues(set<Actor> x)
