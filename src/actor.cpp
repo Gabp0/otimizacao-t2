@@ -44,5 +44,5 @@ ostream &operator<<(ostream &os, const Actor &obj)
 
 bool Actor::operator<(const Actor &obj) const
 {
-    return (this->v < obj.getValue());
+    return (this->id < obj.getId());
 }
