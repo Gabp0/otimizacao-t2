@@ -215,14 +215,11 @@ int Cast::bound(list<Actor> x, list<Actor> a)
         list<Actor> aux(a);
         if (remainingSize > aux.size())
             return numeric_limits<int>::min();
-        cout << "bound" << endl;
         for (size_t i = 0; i < remainingSize; i++)
         {
-            cout << aux.front().getValue() << endl;
             greedySum += aux.front().getValue();
             aux.pop_front();
         }
-        cout << "sum: " << greedySum << endl;
 
         return sumValues(x) + greedySum;
     }
@@ -301,10 +298,10 @@ void Cast::branchAndBound()
 
     auto start = chrono::high_resolution_clock::now();
     a.sort(compareValue);
-    for (Actor ac : a)
-    {
-        cout << ac.getValue() << " / " << ac.getGroupSize() << " = " << ac.getValue() / ac.getGroupSize() << endl;
-    }
+    // for (Actor ac : a)
+    // {
+    //     cout << ac.getValue() << " / " << ac.getGroupSize() << " = " << ac.getValue() / ac.getGroupSize() << endl;
+    // }
 
     this->bb(x, a); // chamada do branch and bound
     auto stop = chrono::high_resolution_clock::now();
