@@ -227,6 +227,11 @@ bool compareValue(const Actor &first, const Actor &second)
     return ((first.getValue() / first.getGroupSize()) < (second.getValue() / second.getGroupSize()));
 }
 
+bool compareId(const Actor &first, const Actor &second)
+{
+    return (first.getId() < second.getId());
+}
+
 void Cast::branchAndBound()
 {
     list<Actor> a(this->a);
@@ -252,9 +257,9 @@ void Cast::showResults()
     }
     else
     {
-        for (auto itr = this->xopt.begin(); itr != this->xopt.end(); ++itr)
+        this->xopt.sort(compareId);
+        for (Actor ac : this->xopt)
         {
-            Actor ac = *itr;
             cout << ac.getId() << " ";
         }
         cout << endl;
