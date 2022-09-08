@@ -235,8 +235,6 @@ void Cast::bb(list<Actor> x, list<Actor> a)
         if (v < this->opt)
         { // testa se é melhor que o otimo
             this->opt = v;
-            this->xopt.~list();
-           
             this->xopt = list(x);
         }
     }
@@ -297,15 +295,15 @@ void Cast::branchAndBound()
 
 void Cast::showResults()
 {
+
     if (this->opt == numeric_limits<int>::max())
     {
         cout << "Inviável" << endl;
     }
     else
     {
-        for (auto itr = this->xopt.begin(); itr != this->xopt.end(); ++itr)
+        for (Actor ac : this->xopt)
         {
-            Actor ac = *itr;
             cout << ac.getId() << " ";
         }
         cout << endl;
