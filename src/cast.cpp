@@ -125,7 +125,6 @@ void Cast::bb(set<Actor> x, set<Actor> a)
     {
         if (this->viabCut && (!(x.size() + a.size() >= this->n) || !(groupSetUnionXA(x, a).size() == this->l)))
         { // corte por viabilidade
-            cout << "cortando por viabilidade" << endl;
             return;
         }
         else
