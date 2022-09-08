@@ -2,6 +2,7 @@
 #define __CAST__
 
 #include <set>
+#include <list>
 #include "actor.h"
 
 using namespace std;
@@ -12,8 +13,8 @@ private:
     int l;           // S = {1,...,l} -> conjunto de grupos da sociedade
     int m;           // numero de atores
     int n;           // P = {1,...,n} -> conjunto de papeis
-    set<Actor> a;    // A = {1,...,m} -> conjunto de atores
-    set<Actor> xopt; // conjunto de atores selecionados
+    list<Actor> a;    // A = {1,...,m} -> conjunto de atores
+    list<Actor> xopt; // conjunto de atores selecionados
     int opt;         // otimo
 
     bool defFunc; // controle do bb
@@ -23,10 +24,10 @@ private:
     int nodeCount;
     int64_t duration;
 
-    void bb(set<Actor> x, set<Actor> a);
-    int bound(set<Actor> x, set<Actor> a);
-    int groupSetUnionX(set<Actor> x);
-    int groupSetUnionXA(set<Actor> x, set<Actor> a);
+    void bb(list<Actor> x, list<Actor> a);
+    int bound(list<Actor> x, list<Actor> a);
+    int groupSetUnionX(list<Actor> x);
+    int groupSetUnionXA(list<Actor> x, list<Actor> a);
 
 public:
     Cast(/* args */);
