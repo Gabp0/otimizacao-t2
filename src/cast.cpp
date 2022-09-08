@@ -224,7 +224,7 @@ void Cast::bb(list<Actor> x, list<Actor> a)
 
 bool compareValue(const Actor &first, const Actor &second)
 {
-    return ((first.getValue() / first.getGroupSize()) < (second.getValue() / second.getGroupSize()));
+    return ((first.getValue() / first.getGroupSize()) > (second.getValue() / second.getGroupSize()));
 }
 
 void Cast::branchAndBound()
