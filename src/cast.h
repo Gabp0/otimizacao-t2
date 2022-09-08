@@ -25,6 +25,8 @@ private:
 
     void bb(set<Actor> x, set<Actor> a);
     int bound(set<Actor> x, set<Actor> a);
+    int groupSetUnionX(set<Actor> x);
+    int groupSetUnionXA(set<Actor> x, set<Actor> a);
 
 public:
     Cast(/* args */);

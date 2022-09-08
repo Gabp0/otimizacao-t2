@@ -1,5 +1,6 @@
 #include "cast.h"
 #include "actor.h"
+#include "quicksort.h"
 #include <set>
 #include <iostream>
 #include <limits>
@@ -49,40 +50,85 @@ void Cast::toggleOptimalityCut()
     this->optCut = !this->optCut;
 }
 
-set<int> groupSetUnionX(set<Actor> x)
-// faz a uniao dos grupos dos conjuntos de atores X, entao compara com S
+int Cast::groupSetUnionX(set<Actor> x)
+// faz a uniao dos grupos dos conjuntos de atores X
 {
-    set<int> ux;
+    int b[this->l];
+    int bSize = 0;
+
     for (auto itr = x.begin(); itr != x.end(); ++itr)
     {
         Actor ac = *itr;
         set<int> groups = ac.getGroups();
-        ux.insert(groups.begin(), groups.end());
-    }
+        for (auto itr2 = groups.begin(); itr2 != groups.end(); ++itr2)
+        {
+            int g = *itr2;
+            int i;
 
-    return ux;
+            for (i = 0; i < bSize; i++)
+            {
+                if (g == b[i])
+                    break;
+            }
+            if (i == bSize)
+            {
+                b[bSize] = g;
+                bSize++;
+            }
+        }
+    }
+    return bSize;
 }
 
-set<int> groupSetUnionXA(set<Actor> x, set<Actor> a)
-// faz a uniao dos grupos dos conjuntos de atores X e A, entao compara com S
+int Cast::groupSetUnionXA(set<Actor> x, set<Actor> a)
+// faz a uniao dos grupos dos conjuntos de atores X
 {
-    set<int> uxa;
+    int b[this->l];
+    int bSize = 0;
 
     for (auto itr = x.begin(); itr != x.end(); ++itr)
     {
         Actor ac = *itr;
         set<int> groups = ac.getGroups();
-        uxa.insert(groups.begin(), groups.end());
-    }
+        for (auto itr2 = groups.begin(); itr2 != groups.end(); ++itr2)
+        {
+            int g = *itr2;
+            int i;
 
+            for (i = 0; i < bSize; i++)
+            {
+                if (g == b[i])
+                    break;
+            }
+            if (i == bSize)
+            {
+                b[bSize] = g;
+                bSize++;
+            }
+        }
+    }
     for (auto itr = a.begin(); itr != a.end(); ++itr)
     {
         Actor ac = *itr;
         set<int> groups = ac.getGroups();
-        uxa.insert(groups.begin(), groups.end());
-    }
+        for (auto itr2 = groups.begin(); itr2 != groups.end(); ++itr2)
+        {
+            int g = *itr2;
+            int i;
 
-    return uxa;
+            for (i = 0; i < bSize; i++)
+            {
+                if (g == b[i])
+                    break;
+            }
+            if (i == bSize)
+            {
+                b[bSize] = g;
+                bSize++;
+            }
+        }
+    }
+    return bSize;
 }
 
 int sumValues(set<Actor> x)
@@ -116,6 +162,25 @@ int Cast::bound(set<Actor> x, set<Actor> a)
 {
     if (this->defFunc)
     {
+        int aSize = a.size();
+        double b[aSize];
+        int i = 0;
+        for (auto itr = a.begin(); itr != a.end(); ++itr)
+        {
+            Actor ac = *itr;
+            b[i] = ac.getValue() / ac.getGroupSize();
+        }
+        quickSort(b, 0, aSize);
+
+        double gulosoSum = 0;
+        // cout << aSize << " " << this->n - x.size() << "\n";
+
+        for (int i = 0; i < this->n - x.size() && i < aSize; i++)
+        {
+            gulosoSum += b[i];
+        }
+        return sumValues(x) + gulosoSum;
+
         return numeric_limits<int>::min();
     }
 
@@ -124,7 +189,7 @@ int Cast::bound(set<Actor> x, set<Actor> a)
 
 void Cast::bb(set<Actor> x, set<Actor> a)
 {
-    if ((x.size() == this->n) && (groupSetUnionX(x).size() == this->l))
+    if ((x.size() == this->n) && (groupSetUnionX(x) == this->l))
     { // folha da arvore
 
         int v = sumValues(x);
@@ -141,7 +206,7 @@ void Cast::bb(set<Actor> x, set<Actor> a)
     }
     else
     {
-        if (this->viabCut && (!(x.size() + a.size() >= this->n) || !(groupSetUnionXA(x, a).size() == this->l)))
+        if (this->viabCut && (!(x.size() + a.size() >= this->n) || !(groupSetUnionXA(x, a) == this->l)))
         { // corte por viabilidade
             return;
         }
@@ -159,8 +224,8 @@ void Cast::bb(set<Actor> x, set<Actor> a)
             this->nodeCount++;
             bb(x, a); // nao contem o elemento
 
-            x.insert(cl);
             this->nodeCount++;
+            x.insert(cl);
             bb(x, a); // contem o elemento
 
             return;
