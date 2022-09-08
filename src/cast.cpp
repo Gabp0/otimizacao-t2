@@ -98,10 +98,28 @@ int sumValues(set<Actor> x)
     return sum;
 }
 
-int bound(bool defaultFunction)
+int minValue(set<Actor> x)
+{
+    int min = numeric_limits<int>::min();
+    for (auto itr = x.begin(); itr != x.end(); ++itr)
+    {
+        Actor ac = *itr;
+        if (ac.getValue() < min)
+            min = ac.getValue();
+    }
+
+    return min;
+}
+
+int Cast::bound(set<Actor> x, set<Actor> a)
 // funcao limitante
 {
-    return numeric_limits<int>::min();
+    if (this->defFunc)
+    {
+        return numeric_limits<int>::min();
+    }
+
+    return sumValues(x) + (this->n - x.size()) * minValue(a);
 }
 
 void Cast::bb(set<Actor> x, set<Actor> a)
@@ -129,7 +147,7 @@ void Cast::bb(set<Actor> x, set<Actor> a)
         }
         else
         {
-            int b = bound(this->defFunc);
+            int b = bound(x, a);
             if (this->optCut && (b >= this->opt))
             { // corte por otimalidade
                 return;

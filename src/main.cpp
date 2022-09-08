@@ -4,9 +4,9 @@ int main(int argc, char const *argv[])
 {
     Cast c;
 
-    // c.toggleDefaultFunc();
+    c.toggleDefaultFunc();
     // c.toggleOptimalityCut();
-    // c.toggleViabilityCut();
+    //  c.toggleViabilityCut();
 
     c.branchAndBound();
 

@@ -24,6 +24,7 @@ private:
     int64_t duration;
 
     void bb(set<Actor> x, set<Actor> a);
+    int bound(set<Actor> x, set<Actor> a);
 
 public:
     Cast(/* args */);
