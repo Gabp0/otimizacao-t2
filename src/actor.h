@@ -1,17 +1,17 @@
 #ifndef __ACTOR__
 #define __ACTOR__
 
-#include <set>
+#include <list>
 #include <iostream>
 using namespace std;
 
 class Actor
 {
 private:
-    int id;          // identificador do ator
-    int v;           // valor cobrado
-    int s;           // numero de grupos
-    set<int> groups; // indices dos grupos
+    int id;           // identificador do ator
+    int v;            // valor cobrado
+    int s;            // numero de grupos
+    list<int> groups; // indices dos grupos
 
 public:
     Actor(int id, int v, int s);
@@ -19,7 +19,7 @@ public:
     int getId() const;
     int getValue() const;
     int getGroupSize() const;
-    set<int> getGroups();
+    list<int> getGroups();
     void addGroup(int g);
     bool operator<(const Actor &obj) const;
     friend ostream &operator<<(ostream &os, const Actor &obj);

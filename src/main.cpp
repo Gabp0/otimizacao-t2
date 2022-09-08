@@ -10,6 +10,7 @@ bool argExists(int argc, char **argv, const string &option)
 
 int main(int argc, char *argv[])
 {
+
     Cast c;
 
     if (argExists(argc, argv, "-f"))

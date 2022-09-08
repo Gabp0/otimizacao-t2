@@ -1,6 +1,6 @@
 #include "actor.h"
 #include <iostream>
-#include <set>
+#include <list>
 
 using namespace std;
 
@@ -26,14 +26,14 @@ int Actor::getGroupSize() const
     return this->s;
 }
 
-set<int> Actor::getGroups()
+list<int> Actor::getGroups()
 {
     return this->groups;
 }
 
 void Actor::addGroup(int g)
 {
-    this->groups.insert(g);
+    this->groups.push_back(g);
 }
 
 ostream &operator<<(ostream &os, const Actor &obj)
