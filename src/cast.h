@@ -20,7 +20,8 @@ private:
     bool viabCut;
     bool optCut;
 
-    int node;
+    int nodeCount;
+    int64_t duration;
 
     void bb(set<Actor> x, set<Actor> a);
 
@@ -32,6 +33,7 @@ public:
     void toggleViabilityCut();
     void toggleOptimalityCut();
     void branchAndBound();
+    void showResults();
 };
 
 #endif

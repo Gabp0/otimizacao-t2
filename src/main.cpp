@@ -10,5 +10,7 @@ int main(int argc, char const *argv[])
 
     c.branchAndBound();
 
+    c.showResults();
+
     return 0;
 }

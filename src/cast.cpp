@@ -49,7 +49,7 @@ void Cast::toggleOptimalityCut()
     this->optCut = !this->optCut;
 }
 
-bool checkUnionX(set<Actor> x, int l)
+set<int> groupSetUnionX(set<Actor> x)
 // faz a uniao dos grupos dos conjuntos de atores X, entao compara com S
 {
     set<int> ux;
@@ -60,10 +60,10 @@ bool checkUnionX(set<Actor> x, int l)
         ux.insert(groups.begin(), groups.end());
     }
 
-    return ux.size() == l;
+    return ux;
 }
 
-bool checkUnionXA(set<Actor> x, set<Actor> a, int l)
+set<int> groupSetUnionXA(set<Actor> x, set<Actor> a)
 // faz a uniao dos grupos dos conjuntos de atores X e A, entao compara com S
 {
     set<int> uxa;
@@ -82,7 +82,7 @@ bool checkUnionXA(set<Actor> x, set<Actor> a, int l)
         uxa.insert(groups.begin(), groups.end());
     }
 
-    return uxa.size() == l;
+    return uxa;
 }
 
 int sumValues(set<Actor> x)
@@ -106,7 +106,7 @@ int bound(bool defaultFunction)
 
 void Cast::bb(set<Actor> x, set<Actor> a)
 {
-    if ((x.size() == this->n) && (checkUnionX(x, this->l)))
+    if ((x.size() == this->n) && (groupSetUnionX(x).size() == this->l))
     { // folha da arvore
 
         int v = sumValues(x);
@@ -123,8 +123,9 @@ void Cast::bb(set<Actor> x, set<Actor> a)
     }
     else
     {
-        if (this->viabCut && (!(x.size() + a.size() >= this->n) || !(checkUnionXA(x, a, this->l))))
+        if (this->viabCut && (!(x.size() + a.size() >= this->n) || !(groupSetUnionXA(x, a).size() == this->l)))
         { // corte por viabilidade
+            cout << "cortando por viabilidade" << endl;
             return;
         }
         else
@@ -138,11 +139,11 @@ void Cast::bb(set<Actor> x, set<Actor> a)
             auto cl = *a.begin();
             a.erase(a.begin());
 
-            this->node++;
+            this->nodeCount++;
             bb(x, a); // nao contem o elemento
 
             x.insert(cl);
-            this->node++;
+            this->nodeCount++;
             bb(x, a); // contem o elemento
 
             return;
@@ -158,13 +159,17 @@ void Cast::branchAndBound()
     set<Actor> x; // atores escolhidos
 
     this->opt = numeric_limits<int>::max(); // otimo
-    this->node = 0;                         // numero de nodos
+    this->nodeCount = 0;                    // numero de nodos
 
     auto start = chrono::high_resolution_clock::now();
     this->bb(x, a); // chamada do branch and bound
     auto stop = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+    this->duration = duration.count();
+}
 
+void Cast::showResults()
+{
     if (this->opt == numeric_limits<int>::max())
     {
         cout << "Inviável" << endl;
@@ -180,6 +185,6 @@ void Cast::branchAndBound()
         cout << this->opt << endl;
     }
 
-    cerr << "Tempo: " << duration.count() << " microsegundos" << endl;
-    cerr << "Nodes: " << this->node << endl;
+    cerr << "Tempo: " << this->duration << " microsegundos" << endl;
+    cerr << "Nodes: " << this->nodeCount << endl;
 }
