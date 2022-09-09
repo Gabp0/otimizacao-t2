@@ -90,23 +90,45 @@
 
 \section{O algoritmo}
 
-\paragraph{} Finalmente, temos a implementação do algoritmo de \emph{branch and bound} para a solução do problema:
+\paragraph{} Finalmente, temos a implementação do algoritmo de \emph{branch and bound} para a solução do problema. Dados os conjuntos \emph{A}, \emph{P} e \emph{S}; \emph{$X_{opt}$} e \emph{opt} globais; a função \emph{sort} externa que ordena de acordo com os valores \emph{$v_a$} de cada ator em ordem crescente; a função \emph{bound} igual a \emph{$B_1$} ou \emph{$B_2$} previamente citadas, temos:
 
 \begin{algorithm}
     \DontPrintSemicolon
+
+    \emph{opt} $\leftarrow \infty$ \;
+    \emph{$X_{opt}$} $\leftarrow \emptyset$ \; 
+    \emph{A} $\leftarrow$ \emph{sort(A)} \;
+    \emph{X} $\leftarrow \emptyset$ \; 
+    \emph{BB}(\emph{X, A}) \; \;
+
     \SetKwFunction{FBB}{BB}
     \SetKwProg{Fn}{Function}{:}{}
     \Fn{\FBB{X, A}}{
-        \emph{i} $\leftarrow$ |\emph{P}| - |\emph{X}|\;
-        \emph{s} $\leftarrow$ 0\;
-        \For{$a \in A$}{
-            \If{\emph{i} $\leq$ 0}{
-                \Return{\emph{s}}
+        \uIf{\emph{|}X\emph{|} = \emph{|}P\emph{|} \textbf{and} \emph{$\bigcup_{a \in X} S_a = S$}}{
+            \If{$\sum_{a \in X} v_a \leq opt$}{
+                \emph{opt} $\leftarrow \sum_{a \in X} v_a$\;
+                $X_{opt} \leftarrow X$ 
             }
-            \emph{s} $\leftarrow$ \emph{s} + $v_a$ \;
-            \emph{i} $\leftarrow$ \emph{i} - 1\;
         }
-        \Return{s}
+        \uElseIf{A = $\emptyset$}{
+            \Return{}
+        }
+        \Else{
+            \eIf{\emph{(}\emph{|}X\emph{|} + \emph{|}A\emph{|} $\geq$ \emph{|}P\emph{|}\emph{)} \textbf{and} \emph{(}{$(\bigcup_{a \in X} S_a) \cup (\bigcup_{a \in A} S_a) = S$}\emph{)}}{
+                \textbf{B} $\leftarrow$ \emph{bound}(\emph{X, A})\;
+                \eIf{\textbf{B} $\geq$ opt}{
+                    \Return{}
+                }{
+                    \emph{x} $\leftarrow$ \emph{A}[1] \;
+                    \emph{A} $\leftarrow$ \emph{A - A}[1] \;
+                    \emph{BB}(\emph{X, A})\;
+                    \emph{BB}(\emph{X $\cup$ \emph{\{x\}}, A})\;
+                }
+            }{
+                \Return{}
+            }   
+        }
+
     }
 \end{algorithm}
 
