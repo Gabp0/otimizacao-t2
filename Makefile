@@ -3,7 +3,7 @@ VPATH = src/
 CC = gcc
 CFLAGS = -lstdc++
 
-objs = main.o cast.o actor.o quicksort.o
+objs = main.o cast.o actor.o 
 
 all: elenco
 
@@ -13,7 +13,6 @@ elenco: $(objs)
 main.o: main.cpp cast.h
 cast.o: cast.cpp cast.h actor.h
 actor.o: actor.cpp actor.h
-quicksort.o: quicksort.cpp quicksort.h
 
 clean:
 	-rm -f $(objs) *~
