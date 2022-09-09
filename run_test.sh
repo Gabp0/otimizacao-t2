@@ -1,3 +1,5 @@
+#!/bin/bash
+
 echo > resultados.txt
 for counter in {1..1000}
 do
@@ -14,12 +16,12 @@ do
     echo "${GROUPS} ${PEOPLE} ${ROLES}" >> resultados.txt
     
     echo "Rodando o main com -a"
-    ./elenco_main -a < run_test_saida.txt > saida_main.txt
+    ./elenco_main -a < run_test_saida.txt >> saida_main.txt
     
     echo "Rodando o da branch"
-    ./elenco < run_test_saida.txt > saida_branch.txt
+    ./elenco < run_test_saida.txt >> saida_branch.txt
     
-    diff saida_main.txt saida_branch.txt >> resultados.txt
+    #diff saida_main.txt saida_branch.txt >> resultados.txt
     
     rm run_test_saida.txt
 done

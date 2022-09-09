@@ -262,11 +262,11 @@ void Cast::showResults()
     }
     else
     {
-        this->xopt.sort(compareId);
-        for (Actor ac : this->xopt)
-        {
-            cout << ac.getId() << " ";
-        }
+        // this->xopt.sort(compareId);
+        // for (Actor ac : this->xopt)
+        // {
+        //     cout << ac.getId() << " ";
+        // }
         cout << endl;
         cout << this->opt << endl;
     }
