@@ -1,6 +1,7 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{algorithm2e}
 
 \title{Otimização - Trabalho 2}
 \author{
@@ -37,6 +38,8 @@
     \item O valor de \emph{$\sum_{a \in X} v_a$} deve ser mínimo;
 \end{itemize}
 
+\pagebreak
+
 \section{A modelagem}
 
 \paragraph{} Nessa sessão será feita a análise das decisões feitas em relação a modelagem do algoritmo de \emph{branch and bound}, com ênfase nos aspectos de viabilidade e otimalidade, assim como a geração dos nós da árvore gerada pelas chamadas recursivas.
@@ -47,8 +50,64 @@
 
 \paragraph{} Se o algoritmo não atingiu um nó folha, ele irá testar se ainda é possível gerar uma solução viável naquele ramo da árvore, ou seja, se |\emph{X}| + |\emph{A}| $\geq$ |\emph{P}| e \emph{$(\bigcup_{a \in X} S_a) \cup (\bigcup_{a \in A} S_a) = S$}. Caso seja falso, tal ramo da árvore será "cortado", ou seja, não irá executar a chamada recursiva.
 
-\paragraph{} O último teste executado antes da chamada recursiva utiliza uma função de \emph{bound}, ou limitante, para saber se ainda é possível atingir um valor melhor que o ótimo naquele ramo. Note que, para que haja um ganho no algoritmo, a função escolhida para calcular o limitante precisa ser mais eficiente do que a "descida" até a folha do ramo atual da árvore. Entretanto, o valor retornado não precisa ser exato, pois servirá apenas como um limite superior, mas deve ser "otimista", retornado um valor melhor do que aquele que seria obtido no ramo. Nesse caso, sendo este um problema de minimização, temos que se \emph{bound(X, A)} $\leq$ \emph{opt} é falso, a chamada recursiva não será executada. Será feita a análise da função escolhida na próxima sessão desse artigo.
+\paragraph{} O último teste executado antes da chamada recursiva utiliza uma função de \emph{bound}, ou limitante, para saber se ainda é possível atingir um valor melhor que o ótimo naquele ramo. Note que, para que haja um ganho no algoritmo, a função escolhida para calcular o limitante precisa ser mais eficiente do que a "descida" até a folha do ramo atual da árvore. Entretanto, o valor retornado não precisa ser exato, pois servirá apenas como um limite superior, mas deve ser "otimista", retornado um valor melhor do que aquele que seria obtido no ramo. Nesse caso, sendo este um problema de minimização, temos que se \emph{bound(X, A)} $\leq$ \emph{opt} é falso, a chamada recursiva não será executada. A análise da função escolhida será feita na próxima sessão desse artigo.
 
-\section{O programa linear}
+\paragraph{} Por fim, são executadas duas chamadas recursivas. Na primeira, um elemento de \emph{A} é removido e do conjunto e inserido em \emph{X}. Na segunda, é apenas removido um elemento de \emph{A}. 
+
+\section{A função limitante}
+
+\paragraph{} Foram feitos testes com duas funções de \emph{bound} diferentes, sendo a primeira delas: 
+\begin{equation*}
+    \emph{B}_1(\emph{X, A}) = \emph{$\sum_{a \in X} +$ $(|P| - |X|)$} \times min\{\emph{$v_a$ $|$ $a \in A$}\}
+\end{equation*}
+\paragraph{} Onde $\emph{B}_1(\emph{X, A})$ é a soma dos valores \emph{$v_a$} dos atores já escolhidos no conjunto \emph{X} mais o valor mais baixo do conjunto \emph{A} multiplicado pelo número restante de papéis. Observe que essa função ignora as restrições de grupos sociais e a limitação de apenas um papel por ator, para se encaixar nas especificações previamente citas para uma função de \emph{bound}.
+
+\paragraph{} A segunda função limitante se utiliza do fato de que, como foi previamente citado, o conjunto \emph{A} foi implementado utilizando um vetor e este foi previamente ordenado de acordo com o valor \emph{$v_a$} de cada ator em ordem crescente. Desse modo, temos:
+\begin{equation*}
+    \emph{B}_2(\emph{X, A}) = \emph{$\sum_{a \in X} +$ G(X, A)}
+\end{equation*}
+
+\begin{algorithm}
+    \DontPrintSemicolon
+    \SetKwFunction{FG}{G}
+    \SetKwProg{Fn}{Function}{:}{}
+    \Fn{\FG{X, A}}{
+        \emph{i} $\leftarrow$ |\emph{P}| - |\emph{X}|\;
+        \emph{s} $\leftarrow$ 0\;
+        \For{$a \in A$}{
+            \If{\emph{i} $\leq$ 0}{
+                \Return{\emph{s}}
+            }
+            \emph{s} $\leftarrow$ \emph{s} + $v_a$ \;
+            \emph{i} $\leftarrow$ \emph{i} - 1\;
+        }
+        \Return{s}
+    }
+\end{algorithm}
+
+\paragraph{} Onde $\emph{B}_2(\emph{X, A})$ é a soma dos valores \emph{$v_a$} dos atores já escolhidos no conjunto \emph{X} mais a função $\emph{G}(\emph{X, A})$, a qual consiste de um algoritmo \emph{guloso} que faz a soma dos valores \emph{$v_a$} para os |\emph{P}| - |\emph{X}| primeiros $\emph{a} \in \emph{A}$, levando em conta o fato de que \emph{A} está ordenado de acordo com o valor de cada ator em ordem crescente. Nota que essa, além de se encaixar nas especificações para função de \emph{bound}, pode ser dita "melhor" do que $\emph{B}_1(\emph{X, A})$, pois ela ignora apenas a restrição dos grupos sociais, retornando um valor mais próximo do qual seria obtido ao descer até a folha e, consequentemente, "cortando" mais ramos. Será possível notar a diferença na performance entre as duas sessão 6 desse artigo.
+\pagebreak
+
+\section{O algoritmo}
+
+\paragraph{} Finalmente, temos a implementação do algoritmo de \emph{branch and bound} para a solução do problema:
+
+\begin{algorithm}
+    \DontPrintSemicolon
+    \SetKwFunction{FBB}{BB}
+    \SetKwProg{Fn}{Function}{:}{}
+    \Fn{\FBB{X, A}}{
+        \emph{i} $\leftarrow$ |\emph{P}| - |\emph{X}|\;
+        \emph{s} $\leftarrow$ 0\;
+        \For{$a \in A$}{
+            \If{\emph{i} $\leq$ 0}{
+                \Return{\emph{s}}
+            }
+            \emph{s} $\leftarrow$ \emph{s} + $v_a$ \;
+            \emph{i} $\leftarrow$ \emph{i} - 1\;
+        }
+        \Return{s}
+    }
+\end{algorithm}
 
 \end{document}
