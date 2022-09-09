@@ -239,10 +239,10 @@ void Cast::branchAndBound()
     list<Actor> x; // atores escolhidos
 
     a.sort(compareValue);
-    for (Actor ac : a)
-    {
-        cout << ac.getValue() << " " << endl;
-    }
+    // for (Actor ac : a)
+    // {
+    //     cout << ac.getValue() << " " << endl;
+    // }
 
     this->opt = numeric_limits<int>::max(); // otimo
     this->nodeCount = 0;                    // numero de nodos
