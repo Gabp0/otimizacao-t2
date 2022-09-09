@@ -225,7 +225,7 @@ void Cast::bb(list<Actor> x, list<Actor> a)
 bool compareValue(const Actor &first, const Actor &second)
 {
     // return ((first.getValue() / first.getGroupSize()) > (second.getValue() / second.getGroupSize()));
-    return ((first.getValue()) < (second.getValue()));
+    return ((first.getValue()) > (second.getValue()));
 }
 
 bool compareId(const Actor &first, const Actor &second)
@@ -239,6 +239,10 @@ void Cast::branchAndBound()
     list<Actor> x; // atores escolhidos
 
     a.sort(compareValue);
+    for (Actor ac : a)
+    {
+        cout << ac.getValue() << " " << endl;
+    }
 
     this->opt = numeric_limits<int>::max(); // otimo
     this->nodeCount = 0;                    // numero de nodos
