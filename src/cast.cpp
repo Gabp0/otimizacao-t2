@@ -162,14 +162,14 @@ int Cast::bound(list<Actor> x, list<Actor> a)
 {
     if (this->defFunc)
     {
-        double gulosoSum = 0;
+        double greedySum = 0;
         auto it = a.begin();
 
         for (int i = 0; i < this->n - x.size() && i < a.size(); i++, ++it)
         {
-            gulosoSum += it->getValue() / it->getGroupSize();
+            greedySum += it->getValue();
         }
-        return sumValues(x) + gulosoSum;
+        return sumValues(x) + greedySum;
     }
 
     return sumValues(x) + (this->n - x.size()) * minValue(a);
@@ -222,7 +222,7 @@ void Cast::bb(list<Actor> x, list<Actor> a)
 
 bool compareValue(const Actor &first, const Actor &second)
 {
-    return (first.getValue() > second.getValue());
+    return (first.getValue() < second.getValue());
 }
 
 bool compareId(const Actor &first, const Actor &second)

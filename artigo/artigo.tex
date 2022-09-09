@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 
 \title{Otimização - Trabalho 2}
 \author{
@@ -23,58 +24,31 @@
 \paragraph{} Esse artigo trata da descrição de uma possível implementação utilizando um algoritmo com a técnica de \emph{branch and bound} para o problema do elenco, o qual consiste em selecionar um determinado subconjunto de atores que atendem a certos requisitos de forma a diminuir o custo total. 
 
 \section{O problema}
-\paragraph{} Uma usina hidroelétrica e uma termoelétrica, a qual só é utilizada quando a primeira não é suficiente para suprimir a demanda, abastecem a rede de energia de uma cidade. O objetivo do problema é conceber um plano de geração mensal, durante um período de \emph{n} meses que minimiza o custo considerando as seguintes informações:
+\paragraph{} Uma produtora de filmes precisa selecionar um elenco para um filme de forma a minimizar o custo de produção ao mesmo tempo que todos os grupos sociais elencados previamente sejam representados. Temos que:
 
 \begin{itemize}
-    \item O custo de geração de hidroelétrica é nulo, porém ela possui um custo ambiental em função da variação do volume, em $\emph{m}^3$, do reservatório de um mês para outro;
-    \item A termoelétrica é associado um custo de geração para cada \emph{MWatt} de energia;
-    \item A termoelétrica possui um limite de geração mensal;
-    \item O reservatório possui um limite mínimo e máximo em $\emph{m}^3$;
-    \item O reservatório começa com um volume inicial em $\emph{m}^3$;
-    \item O reservatório recebe um volume de água mensal ($\emph{m}^3$) proveniente de chuvas, afluências, etc;
-    \item A cada 1 $\emph{m}^3$ de água consumido do reservatório é gerado \emph{kMWatt} de energia, onde \emph{k} é um coeficiente de geração dado;
-    \item A geração das duas usinas juntas deve suprir as demandas mensais da cidade. Não é um problema gerar mais do que o necessário;
+    \item O conjunto \emph{S} representa os grupos sociais;
+    \item O conjunto \emph{A} representa os atores que podem ser selecionados;
+    \item O conjunto \emph{P} representa os papéis que podem ser dados aos atores;
+    \item Para cada ator \emph{$a \in A$} temos associado um conjunto $\emph{S}_\emph{a} \subseteq \emph{S}$ indiciando os grupos dos quais faz parte e um custo \emph{$v_a$}; 
+    \item O subconjunto \emph{$X \subseteq A$} representa os atores selecionados, ou seja, a solução do problema;
+    \item Para que a solução seja viável |\emph{X}| = |\emph{P}| ;
+    \item Para que a solução seja viável \emph{$\bigcup_{a \in X} S_a = S$};
+    \item O valor de \emph{$\sum_{a \in X} v_a$} deve ser mínimo;
 \end{itemize}
 
 \section{A modelagem}
-\paragraph{} Incialmente, vamos destacar os valores dados:
-\begin{itemize}
-    \item \emph{CA} é o custo ambiental da hidroelétrica pela variação de volume por $\emph{m}^3$;
-    \item \emph{CT} é o custo de geração da termoelétrica por \emph{MWatt};
-    \item $\emph{t}_{max}$ é a geração máxima da termoelétrica em \emph{MWatt};
-    \item $\emph{v}_{ini}$ é o volume inicial do reservatório;
-    \item $\emph{v}_{min}$ é o volume mínimo do reservatório e $\emph{v}_{max}$ é o volume máximo;
-    \item $\emph{y}_1$,$\emph{y}_2$,\dots,$\emph{y}_n$ consistem da afluência recebida pelo reservatório entre os meses \emph{1} até \emph{n};
-    \item \emph{k} é a constante de geração do reservatório por $\emph{m}^3$;
-    \item $\emph{d}_1$,$\emph{d}_2$,\dots,$\emph{d}_n$ consistem da demanda de energia da cidade entre os meses \emph{1} até \emph{n};
-\end{itemize}
-\paragraph{} Para os valores que serão calculados temos:
-\begin{itemize}
-    \item $\emph{h}_1$,$\emph{h}_2$,\dots,$\emph{h}_n$ consistem do consumo de água da hidroelétrica entre os meses \emph{1} até \emph{n};
-    \item $\emph{t}_1$,$\emph{t}_2$,\dots,$\emph{t}_n$ consistem da geração de energia da termoelétrica entre os meses \emph{1} até \emph{n};
-    \item $\emph{v}_1$,$\emph{v}_2$,\dots,$\emph{v}_n$ consistem do volume do reservatório entre os meses \emph{1} até \emph{n};
-\end{itemize}
-\paragraph{} Desse modo, a função objetivo que queremos minimizar é \emph{$\sum_{i=1}^{n} (CA \cdot | y_{i} - h_{i} | + CT \cdot t_{i})$}, onde temos que \emph{$|y_{i} - h_{i}|$} é a variação do volume do reservatório no final do mês, a qual é multiplicada pelo custo ambiental, e $CT \cdot t_{i}$ representa o custo de geração da termoelétrica. Ambos mês a mês de \emph{1} até \emph{n}.
-\paragraph{} É importante notar que, como se trata de um programa linear, é preciso substituir o modulo pois esse não é uma função linear. Assim, será introduzido as váriaveis positivas $\emph{x}_1$,$\emph{x}_2$,\dots,$\emph{x}_n$ que representam o aumento do volume e $\emph{z}_1$,$\emph{z}_2$,\dots,$\emph{z}_n$ para representar a diminuição. \emph{$| y_{i} - h_{i} |$} será substituído por \emph{$(x_i + z_i)$} e serão adicionadas as restrições \emph{$x_i - z_i = y_i - h_i$} e \emph{$x_i,z_i \ge 0$} para manter a igualdade. A função objetivo final será \emph{$\sum_{i=1}^{n} (CA \cdot (x_i + z_i) + CT \cdot t_{i})$};
-\paragraph{} Temos também que, o volume do mês 1 consiste de \emph{$v_1 = v_{ini} + y_1$}, e o volume dos meses subsequentes de \emph{$v_j = v_{j-1} + y_j - h_{j-1}$} onde temos o volume do mês anterior somado a afluência e subtraido do consumo do mês anterior. 
-\paragraph{} Ademais, o consumo de água do mês atual não pode ser maior do que o volume, assim \emph{$h_i \le v_i$} e o volume em cada um dos meses precisa estar entre o mínimo e o máximo, dessa forma \emph{$v_{min} \le v_i - h_i \le v_{max}$}.
-\paragraph{} Finalmente, temos as restrições de demanda \emph{$k \cdot h_i + t_i \ge d_i $}, onde a soma da geração das duas usinas precisa ser maior ou igual a demanda mensal.
+
+\paragraph{} Nessa sessão será feita a análise das decisões feitas em relação a modelagem do algoritmo de \emph{branch and bound}, com ênfase nos aspectos de viabilidade e otimalidade, assim como a geração dos nós da árvore gerada pelas chamadas recursivas.
+
+\paragraph{} Iremos inicializar o conjunto \emph{$X_{opt} \leftarrow \emptyset$} e a variável \emph{$opt \leftarrow \infty$} (pois se trata de um problema de minimização) que representam o conjunto \emph{X} ótimo atual e \emph{$\sum_{a \in X_{opt}} v_a$}, respectivamente. Antes da execução do algoritmo em si, o conjunto \emph{A}, implementado utilizando um vetor, foi ordenado de acordo com os valores \emph{$v_a$}, em ordem crescente, para ser utilizado futuramente na função de \emph{bound}.
+
+\paragraph{} Assim, para saber se atingiu um nó folha e a solução é viável, o algoritmo executa o teste |\emph{X}| = |\emph{P}| e \emph{$\bigcup_{a \in X} S_a = S$}. Em caso verdadeiro, se \emph{$\sum_{a \in X} v_a \leq opt$}, então \emph{$opt \leftarrow \sum_{a \in X} v_a$} e \emph{$X_{opt} \leftarrow X$}. Note que, no primeiro nó folha viável, o teste esse teste sempre será verdadeiro. Também é possível que ele atinja um nó folha quando |\emph{X}| = |\emph{P}| e \emph{$\bigcup_{a \in X} S_a = S$} é falso, porém \emph{A} = $\emptyset$ é verdadeiro. Nesse caso, a solução é inviável.
+
+\paragraph{} Se o algoritmo não atingiu um nó folha, ele irá testar se ainda é possível gerar uma solução viável naquele ramo da árvore, ou seja, se |\emph{X}| + |\emph{A}| $\geq$ |\emph{P}| e \emph{$(\bigcup_{a \in X} S_a) \cup (\bigcup_{a \in A} S_a) = S$}. Caso seja falso, tal ramo da árvore será "cortado", ou seja, não irá executar a chamada recursiva.
+
+\paragraph{} O último teste executado antes da chamada recursiva utiliza uma função de \emph{bound}, ou limitante, para saber se ainda é possível atingir um valor melhor que o ótimo naquele ramo. Note que, para que haja um ganho no algoritmo, a função escolhida para calcular o limitante precisa ser mais eficiente do que a "descida" até a folha do ramo atual da árvore. Entretanto, o valor retornado não precisa ser exato, pois servirá apenas como um limite superior, mas deve ser "otimista", retornado um valor melhor do que aquele que seria obtido no ramo. Nesse caso, sendo este um problema de minimização, temos que se \emph{bound(X, A)} $\leq$ \emph{opt} é falso, a chamada recursiva não será executada. Será feita a análise da função escolhida na próxima sessão desse artigo.
 
 \section{O programa linear}
-\paragraph{} O programa linear resultante será:
-
-\begin{equation*}
-    \begin{array}{ll@{}ll}
-        \textbf{min}  & \sum_{i=1}^{n} (CA \cdot x_i + CA \cdot z_i + CT \cdot t_{i}) &\\
-        \textbf{s.t.} & x_i - z_i = y_i - h_i &i=1 ,\dots, n\\
-                      & v_1 = v_{ini} + y_1 &\\ 
-                      & v_j = v_{j-1} + y_j - h_{j-1} &j=2 ,\dots, n-1&\\
-                      & h_i \le v_i &\\
-                      & v_{min} \le v_i - h_i \le v_{max} &\\
-                      & k \cdot h_i + t_i \ge d_i &\\
-                      & x_i,z_i,h_i,t_i \ge 0
-    \end{array}
-\end{equation*}
-
 
 \end{document}
