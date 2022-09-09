@@ -1,6 +1,5 @@
 #include "cast.h"
 #include "actor.h"
-#include "quicksort.h"
 #include <set>
 #include <list>
 #include <iostream>
@@ -82,7 +81,7 @@ int Cast::groupSetUnionX(list<Actor> x)
 }
 
 int Cast::groupSetUnionXA(list<Actor> x, list<Actor> a)
-// faz a uniao dos grupos dos conjuntos de atores X
+// faz a uniao dos grupos dos conjuntos de atores X e A
 {
     int b[this->l];
     int bSize = 0;
@@ -164,7 +163,6 @@ int Cast::bound(list<Actor> x, list<Actor> a)
     if (this->defFunc)
     {
         double gulosoSum = 0;
-        // cout << aSize << " " << this->n - x.size() << "\n";
         auto it = a.begin();
 
         for (int i = 0; i < this->n - x.size() && i < a.size(); i++, ++it)
@@ -224,8 +222,7 @@ void Cast::bb(list<Actor> x, list<Actor> a)
 
 bool compareValue(const Actor &first, const Actor &second)
 {
-    // return ((first.getValue() / first.getGroupSize()) > (second.getValue() / second.getGroupSize()));
-    return ((first.getValue()) > (second.getValue()));
+    return (first.getValue() > second.getValue());
 }
 
 bool compareId(const Actor &first, const Actor &second)
@@ -235,15 +232,14 @@ bool compareId(const Actor &first, const Actor &second)
 
 void Cast::branchAndBound()
 {
-    list<Actor> a(this->a);
-    list<Actor> x; // atores escolhidos
-
-    a.sort(compareValue);
+    list<Actor> a(this->a); // atores que podem ser escolhidos
+    list<Actor> x;          // atores escolhidos
 
     this->opt = numeric_limits<int>::max(); // otimo
     this->nodeCount = 0;                    // numero de nodos
 
     auto start = chrono::high_resolution_clock::now();
+    a.sort(compareValue);
     this->bb(x, a); // chamada do branch and bound
     auto stop = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
