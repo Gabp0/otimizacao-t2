@@ -145,6 +145,7 @@ int sumValues(list<Actor> x)
 }
 
 int minValue(list<Actor> x)
+// retorna o menor valor entre os atores no vetor x
 {
     int min = numeric_limits<int>::min();
     for (Actor itr : x)
@@ -176,6 +177,7 @@ int Cast::bound(list<Actor> x, list<Actor> a)
 }
 
 void Cast::bb(list<Actor> x, list<Actor> a)
+// branch and bound
 {
     if ((x.size() == this->n) && (groupSetUnionX(x) == this->l))
     { // folha da arvore
@@ -238,7 +240,7 @@ void Cast::branchAndBound()
     this->opt = numeric_limits<int>::max(); // otimo
     this->nodeCount = 0;                    // numero de nodos
 
-    auto start = chrono::high_resolution_clock::now();
+    auto start = chrono::high_resolution_clock::now(); // temporizador
     a.sort(compareValue);
     this->bb(x, a); // chamada do branch and bound
     auto stop = chrono::high_resolution_clock::now();
@@ -263,6 +265,6 @@ void Cast::showResults()
         cout << this->opt << endl;
     }
 
-    cerr << "Tempo: " << this->duration << " microsegundos" << endl;
+    cerr << "Tempo: " << this->duration << " microssegundos" << endl;
     cerr << "Nodes: " << this->nodeCount << endl;
 }
